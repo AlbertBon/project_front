@@ -1,5 +1,6 @@
 'use strict'
 require('./check-versions')()
+var webpack=require('webpack')
 
 process.env.NODE_ENV = 'development'
 
