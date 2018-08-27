@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="demo" ref="demo" style="margin:10px"></div>
+    <div id="work" ref="work" style="margin:10px"></div>
     <input id="submit" type="button" value='导出结果' />
     <textarea id="result" row="6"></textarea>
   </div>
@@ -17,23 +17,24 @@
     },
     data() {
       return {
-
       }
     },
     mounted() {
-      this.createGooFlow()
     },
     methods: {
       createGooFlow() {
-        let demo = $.createGooFlow($("#demo"), this.property);
-        demo.setNodeRemarks(this.remark);
-        demo.loadData(this.json);
+        let _this = this;
+        let work = $.createGooFlow($("#work"), this.property);
+        work.setNodeRemarks(this.remark);
+        work.loadData(this.json);
+        return work;
       }
+
 
     }
   }
 </script>
 
-<style scoped>
+<style>
   @import "./utils/GooFlow.css";
 </style>

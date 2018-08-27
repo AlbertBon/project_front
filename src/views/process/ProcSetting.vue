@@ -1,11 +1,13 @@
 <template>
-  <goo-flow :property="property" :json="jsondata" :remark="remark"></goo-flow>
+  <goo-flow
+    ref="gooFlow"
+    :property="property"
+    :json="jsondata"
+    :remark="remark"></goo-flow>
 </template>
 
 <script>
   import GooFlow from '@/components/GooFlow/index.vue'
-
-  // import $ from './utils/jquery.min.js'
   export default {
     components: {GooFlow},
     name: "proc",
@@ -14,10 +16,10 @@
         property: {
           width: 1200,
           height: 540,
-          toolBtns: ["start round mix", "end round", "task", "node", "chat", "state", "plug", "join", "fork", "complex mix"],
+          toolBtns: ["98 round mix", "99 round mix", "01", "00", "04", "02"],
           haveHead: true,
           headLabel: true,
-          headBtns: ["new", "open", "save", "undo", "redo", "reload"],//如果haveHead=true，则定义HEAD区的按钮
+          headBtns: [ "save", "undo", "redo", "reload"],//如果haveHead=true，则定义HEAD区的按钮
           haveTool: true,
           haveGroup: true,
           useOperStack: true
@@ -25,116 +27,67 @@
         remark: {
           cursor: "选择指针",
           direct: "结点连线",
-          start: "入口结点",
-          end: "结束结点",
-          task: "任务结点",
-          node: "自动结点",
-          chat: "决策结点",
-          state: "状态结点",
-          plug: "附加插件",
-          fork: "分支结点",
-          join: "联合结点",
-          complex: "复合结点",
+          '98': "开始节点",
+          '99': "结束结点",
+          '01': "人工节点",
+          '00': "自动结点",
+          '04': "决策结点",
+          '02': "状态结点",
           group: "组织划分框编辑开关"
         },
         jsondata: {
-          "title": "newFlow_1",
-          "nodes": {
-            "demo_node_1": {
-              "name": "开始",
-              "left": 42,
-              "top": 38,
-              "type": "start round mix",
-              "width": 26,
-              "height": 26,
-              "alt": true
-            },
-            "demo_node_2": {
-              "name": "结束",
-              "left": 797,
-              "top": 42,
-              "type": "end round mix",
-              "width": 26,
-              "height": 26,
-              "alt": true
-            },
-            "demo_node_3": {
-              "name": "入职申请",
-              "left": 155,
-              "top": 39,
-              "type": "task",
-              "width": 104,
-              "height": 26,
-              "marked": true,
-              "alt": true
-            },
-            "demo_node_4": {
-              "name": "人力审批",
-              "left": 364,
-              "top": 42,
-              "type": "task",
-              "width": 104,
-              "height": 26,
-              "alt": true
-            },
-            "demo_node_8": {
-              "name": "工资判断",
-              "left": 571,
-              "top": 43,
-              "type": "node",
-              "width": 104,
-              "height": 26,
-              "alt": true
-            },
-            "demo_node_9": {
-              "name": "经理终审",
-              "left": 559,
-              "top": 141,
-              "type": "task",
-              "width": 104,
-              "height": 26,
-              "alt": true
-            }
-          },
-          "lines": {
-            "demo_line_5": {"type": "sl", "from": "demo_node_3", "to": "demo_node_4", "name": "提交申请"},
-            "demo_line_6": {"type": "sl", "from": "demo_node_1", "to": "demo_node_3", "name": ""},
-            "demo_line_7": {"type": "tb", "M": 18.5, "from": "demo_node_4", "to": "demo_node_3", "name": "不通过"},
-            "demo_line_10": {"type": "sl", "from": "demo_node_4", "to": "demo_node_8", "name": "通过"},
-            "demo_line_11": {"type": "tb", "M": 157, "from": "demo_node_9", "to": "demo_node_4", "name": "不接受"},
-            "demo_line_12": {"type": "sl", "from": "demo_node_8", "to": "demo_node_9", "name": "大于8000"},
-            "demo_line_13": {"type": "sl", "from": "demo_node_8", "to": "demo_node_2", "name": "小于8000"},
-            "demo_line_14": {"marked": true, "type": "sl", "from": "demo_node_9", "to": "demo_node_2", "name": "接受"}
-          },
-          "areas": {
-            "1497581247380": {
-              "name": "审议会",
-              "left": 451,
-              "top": 110,
-              "color": "red",
-              "width": 226,
-              "height": 108,
-              "alt": true
-            }
-          },
-          "initNum": 16
-        }
+        },
+        work:{}
       }
     },
-    created() {
-      // this.xyz()
+    mounted() {
+      this.gooFlowInit()
     },
     methods: {
-      // xyz() {
-      //   let demo = $.createGooFlow($("#demo"), this.property);
-      //   demo.setNodeRemarks(this.remark);
-      //   demo.loadData(this.jsondata);
-      // }
+      gooFlowInit(){
+        let _this = this;
+        //调用子组件生成方法并获取子组件生成的gooFlow
+        _this.work = _this.$refs.gooFlow.createGooFlow();
 
+        //新增node触发
+        _this.work.onItemAdd = function(id,type,json){
+          let subJson = Object.assign({},json);
+          // subJson = json;
+          if(type.indexOf("start")>=0){
+            subJson.type = '98'//开始节点
+          }else if(type.indexOf("end")){
+            subJson.type = '99'//结束结点
+          }else if(type.indexOf("node")){
+            subJson.type = '00'//自动结点
+          }else if(type.indexOf("task")){
+            subJson.type = '01'//人工节点
+          }else if(type.indexOf("state")){
+            subJson.type = '02'//状态结点
+          }else if(type.indexOf("chat")){
+            subJson.type = '04'//决策结点
+          }
+          _this.postRequest("/procSetting/save",subJson).then(res => {
+            if (res.data.code == '00') {
+              _this.work.transNewId(id,res.data.data,type);
+            }
+          })
+          console.log(_this.work.exportData())
+          return true;
+        }
+
+        //保存按钮触发
+        _this.work.onBtnSaveClick = function () {
+
+        }
+
+        //刷新按钮
+        _this.work.onFreshClick = function () {
+          console.log(_this.jsondata)
+        }
+      },
     }
   }
 </script>
 
 <style>
-  @import "./utils/GooFlow.css";
 </style>

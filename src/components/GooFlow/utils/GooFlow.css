@@ -51,10 +51,10 @@ v\:group,v\:rect,v\:imagedata,v\:oval,v\:line,v\:polyline,v\:stroke,v\:textbox {
 .GooFlow_work text{color:#fff;font-size:14px;line-height:1.42857143;
 	font-family: "Microsoft Yahei", "Helvetica Neue", Helvetica, Hiragino Sans GB, WenQuanYi Micro Hei, Arial, sans-serif;}
 
-.Gooflow_extend_right{position:absolute;z-index:10002;top:0;right:0;height:100%;width:14px;cursor:e-resize;filter:Alpha(Opacity=20);-moz-opacity:0.2;opacity: 0.2}
-.Gooflow_extend_bottom{position:absolute;z-index:10002;bottom:0;left:0;width:100%;height:14px;cursor:s-resize;filter:Alpha(Opacity=20);-moz-opacity:0.2;opacity: 0.2}
-.Gooflow_extend_right:hover{background-color:#999;border:#fff 1px solid}
-.Gooflow_extend_bottom:hover{background-color:#999;border:#fff 1px solid}
+.Gooflow_ext99_right{position:absolute;z-index:10002;top:0;right:0;height:100%;width:14px;cursor:e-resize;filter:Alpha(Opacity=20);-moz-opacity:0.2;opacity: 0.2}
+.Gooflow_ext99_bottom{position:absolute;z-index:10002;bottom:0;left:0;width:100%;height:14px;cursor:s-resize;filter:Alpha(Opacity=20);-moz-opacity:0.2;opacity: 0.2}
+.Gooflow_ext99_right:hover{background-color:#999;border:#fff 1px solid}
+.Gooflow_ext99_bottom:hover{background-color:#999;border:#fff 1px solid}
 
 .GooFlow_work_group{cursor:default;position:absolute;overflow:hidden;top:0;left:0}
 .GooFlow_area{cursor:default;position:absolute;overflow:hidden;}
@@ -153,8 +153,8 @@ v\:group,v\:rect,v\:imagedata,v\:oval,v\:line,v\:polyline,v\:stroke,v\:textbox {
 }
 
 .GooFlow_area i,.GooFlow .GooFlow_line_oper i,
-.ico_cursor,.ico_start,.ico_end,.ico_fork,.ico_join,.ico_direct,.ico_group,
-.ico_complex,.ico_node,.ico_task,.ico_chat,.ico_state,.ico_plug,.ico_menu,.ico_sound,
+.ico_cursor,.ico_98,.ico_99,.ico_fork,.ico_join,.ico_direct,.ico_group,
+.ico_complex,.ico_00,.ico_01,.ico_04,.ico_02,.ico_plug,.ico_menu,.ico_sound,
 .ico_open,.ico_new,.ico_reload,.ico_save,.ico_undo,.ico_redo,.ico_print {
   font-family:"iconflow" !important;
   font-size:16px;line-height:19px;
@@ -164,17 +164,17 @@ v\:group,v\:rect,v\:imagedata,v\:oval,v\:line,v\:polyline,v\:stroke,v\:textbox {
   -moz-osx-font-smoothing: grayscale;
 }
 .GooFlow .ico_cursor:before{ content:"\e602"; }
-.GooFlow .ico_start:before{ content:"\e700"; }
-.GooFlow .ico_end:before{ content:"\e609"; }
+.GooFlow .ico_98:before{ content:"\e700"; }
+.GooFlow .ico_99:before{ content:"\e609"; }
 .GooFlow .ico_fork:before{ content:"\e60c"; }
 .GooFlow .ico_join:before{ content:"\e606"; }
 .GooFlow .ico_direct:before{ content:"\e605"; }
 .GooFlow .ico_group:before{ content:"\e663"; }
 .GooFlow .ico_complex:before{ content:"\e872"; }
-.GooFlow .ico_node:before{ content:"\e678"; }
-.GooFlow .ico_task:before{ content:"\e6af"; }
-.GooFlow .ico_chat:before{ content:"\e61b"; }
-.GooFlow .ico_state:before{ content:"\e633"; }
+.GooFlow .ico_00:before{ content:"\e678"; }
+.GooFlow .ico_01:before{ content:"\e6af"; }
+.GooFlow .ico_04:before{ content:"\e61b"; }
+.GooFlow .ico_02:before{ content:"\e633"; }
 .GooFlow .ico_plug:before{ content:"\e66c"; }
 .GooFlow .ico_menu:before{ content:"\e649"; }
 .GooFlow .ico_sound:before{ content:"\e62b"; }

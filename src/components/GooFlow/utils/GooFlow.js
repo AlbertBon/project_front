@@ -1235,7 +1235,7 @@ GooFlow.prototype={
 
 		if(this.$editable){
 			//在回退新增操作时,如果节点ID以this.$id+"_node_"开头,则表示为本次编辑时新加入的节点,这些节点的删除不用加入到$deletedItem中
-			if(id.indexOf(this.$id+"_node_")<0)
+			if(id.toString().indexOf(this.$id+"_node_")<0)
 				this.$deletedItem[id]="node";
 		}
 	},
