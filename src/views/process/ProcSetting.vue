@@ -2,7 +2,7 @@
   <goo-flow
     ref="gooFlow"
     :property="property"
-    :json="jsondata"
+    :cur-node="curNode"
     :remark="remark"></goo-flow>
 </template>
 
@@ -14,9 +14,9 @@
     data() {
       return {
         property: {
-          width: 1200,
+          width: 1000,
           height: 540,
-          toolBtns: ["start round mix", "end round mix", "task", "node", "chat", "state", "complex mix"],
+          toolBtns: ["start round mix", "end round mix", "task", "node", "chat", "state"],
           haveHead: true,
           headLabel: true,
           headBtns: ["save"],//如果haveHead=true，则定义HEAD区的按钮
@@ -33,21 +33,23 @@
           node: "自动结点",
           chat: "决策结点",
           state: "状态结点",
-          group: "组织划分框编辑开关"
         },
         jsondata: {
           nodes:{},
           title:"流程",
           lines:{}
         },
-        work:{}
+        work:{},
+        curNode:{
+
+        },
       }
     },
     mounted() {
       this.dataInit()
-
     },
     methods: {
+      //初始化方法
       dataInit(){
         let _this = this;
         //获取节点信息
@@ -55,7 +57,7 @@
           if (res.data.code == '00') {
             let list = res.data.data.list;
             for(let i = 0;i<list.length;i++){
-              let node = {}
+              let node = Object.assign({},list[i])
               node.top = list[i].nodeTop;
               node.name = list[i].nodeName;
               node.left = list[i].nodeLeft;
@@ -77,23 +79,27 @@
               }
               _this.jsondata.nodes[list[i].nodeId] = node;
             }
+            //获取连线
+            _this.postRequest("/procDecision/list",{keyMap:{"equal_formTypeId":"1"}}).then(res => {
+              if (res.data.code == '00') {
+                let list = res.data.data.list;
+                for(let i = 0;i<list.length;i++){
+                  let line = Object.assign({},list[i])
+                  line.from = list[i].nodeId;
+                  line.to = list[i].nextNodeId;
+                  line.name = list[i].name;
+                  line.type = list[i].type;
+                  _this.jsondata.lines[list[i].decisionId] = line;
+                }
+                console.log(_this.jsondata)
+                this.gooFlowInit(_this.jsondata)
+              }
+            })
           }
         })
-        //保存连线
-        _this.postRequest("/procDecision/list",{keyMap:{"equal_formTypeId":"1"}}).then(res => {
-          if (res.data.code == '00') {
-            let list = res.data.data.list;
-            for(let i = 0;i<list.length;i++){
-              let line = {}
-              line.from = list[i].nodeId;
-              line.to = list[i].nextNodeId;
-              line.name = list[i].name;
-              _this.jsondata.lines[list[i].decisionId] = line;
-            }
-            this.gooFlowInit(_this.jsondata)
-          }
-        })
+
       },
+      //初始化工作区方法
       gooFlowInit(json){
         let _this = this;
         //调用子组件生成方法并获取子组件生成的gooFlow
@@ -104,19 +110,24 @@
           console.log(type)
           console.log(json)
           if(type == 'node'){//如果是节点
-            let subJson = Object.assign({},json);
-            if(subJson.type.indexOf("start")>=0){
-              subJson.type = '98'//开始节点
-            }else if(subJson.type.indexOf("end")>=0){
-              subJson.type = '99'//结束结点
-            }else if(subJson.type.indexOf("node")>=0){
-              subJson.type = '00'//自动结点
-            }else if(subJson.type.indexOf("task")>=0){
-              subJson.type = '01'//人工节点
-            }else if(subJson.type.indexOf("state")>=0){
-              subJson.type = '02'//状态结点
-            }else if(subJson.type.indexOf("chat")>=0){
-              subJson.type = '04'//决策结点
+            let subJson = {};
+            subJson.nodeTop = json.top;
+            subJson.nodeName = json.name;
+            subJson.nodeLeft = json.left;
+            subJson.nodeWidth = 26;
+            subJson.nodeHeight = 26;
+            if(json.type.indexOf("start")>=0){
+              subJson.nodeType = '98'//开始节点
+            }else if(json.type.indexOf("end")>=0){
+              subJson.nodeType = '99'//结束结点
+            }else if(json.type.indexOf("node")>=0){
+              subJson.nodeType = '00'//自动结点
+            }else if(json.type.indexOf("task")>=0){
+              subJson.nodeType = '01'//人工节点
+            }else if(json.type.indexOf("state")>=0){
+              subJson.nodeType = '02'//状态结点
+            }else if(json.type.indexOf("chat")>=0){
+              subJson.nodeType = '04'//决策结点
             }
             //保存节点
             _this.postRequest("/procSetting/save",subJson).then(res => {
@@ -125,21 +136,91 @@
               }
             })
           }else if(type == 'line'){
+            let subJson = {};
+            subJson.nodeId = json.from;
+            subJson.nextNodeId = json.to;
+            subJson.name = json.name;
+            subJson.type = 'line';
             //保存连线
-            _this.postRequest("/procDecision/save",json).then(res => {
+            _this.postRequest("/procDecision/save",subJson).then(res => {
               if (res.data.code == '00') {
-
+                // _this.work.transNewId(id,res.data.data,type);
               }
             })
           }
-
           console.log(_this.work.exportData())
+          return true;
+        }
+
+        //选中节点按钮触发
+        _this.work.onItemFocus = function (id,type) {
+          if(type == 'node'){
+            _this.curNode = _this.work.$nodeData[id];
+          }else if(type == 'line'){
+            _this.curNode = _this.work.$lineData[id];
+            _this.curNode.isLine = true;
+          }
+
+          return true;
+        }
+
+        //取消选中节点触发
+        _this.work.onItemBlur = function (id,type) {
+          if(type == 'node'){
+            _this.work.$nodeData[id] = _this.curNode;
+          }else if(type == 'line'){
+            _this.work.$lineData[id] = _this.curNode;
+          }
+          _this.curNode = {};
           return true;
         }
 
         //保存按钮触发
         _this.work.onBtnSaveClick = function () {
+          let subJson = _this.work.exportData();
+          let nodes = []
+          let lines = []
+          for(let node in subJson.nodes){
+            subJson.nodes[node].nodeName = subJson.nodes[node].name;
+            subJson.nodes[node].nodeTop = subJson.nodes[node].top;
+            subJson.nodes[node].nodeLeft = subJson.nodes[node].left;
+            subJson.nodes[node].nodeWidth = subJson.nodes[node].width;
+            subJson.nodes[node].nodeHeight = subJson.nodes[node].height;
+            nodes.push(subJson.nodes[node])
+          }
+          //保存节点
+          _this.postRequest("/procSetting/updateBatch",nodes).then(res => {
+            if (res.data.code == '00') {
+              for(let line in subJson.lines){
+                subJson.lines[line].decisionId = line;
+                subJson.lines[line].nodeId = subJson.lines[line].from;
+                subJson.lines[line].nextNodeId = subJson.lines[line].to;
+                lines.push(subJson.lines[line])
+              }
+              _this.postRequest("/procDecision/updateBatch",lines).then(res => {
+                if (res.data.code == '00') {
+                  _this.$message.success("保存成功");
+                }
+              })
+            }
+          })
+        }
 
+        //删除节点触发
+        _this.work.onItemDel = function (id,type) {
+          if(type == 'node'){
+            _this.getRequest("/procSetting/delete?key="+id).then(res => {
+              if (res.data.code == '00') {
+              }
+            })
+          }else if(type == 'line'){
+            _this.getRequest("/procDecision/delete?key="+id).then(res => {
+              if (res.data.code == '00') {
+              }
+            })
+          }
+          _this.curNode = {};
+          return true;
         }
 
         //刷新按钮
