@@ -12,7 +12,7 @@
         <el-form-item :rules="{required:true,message:'名称不能为空',trigger:'blur'}" label="名称" prop="name">
           <el-input v-model="curNode.name"></el-input>
         </el-form-item>
-        <template v-if="!curNode.isLine">
+        <template v-if="curNode.isNode">
           <el-form-item :rules="{required:true,message:'顶距离不能为空',trigger:'blur'}" label="顶距离" prop="top">
             <el-input v-model="curNode.top"></el-input>
           </el-form-item>

@@ -21,7 +21,7 @@
           headLabel: true,
           headBtns: ["save"],//如果haveHead=true，则定义HEAD区的按钮
           haveTool: true,
-          haveGroup: true,
+          haveGroup: false,
           useOperStack: true
         },
         remark: {
@@ -53,7 +53,7 @@
       dataInit(){
         let _this = this;
         //获取节点信息
-        _this.postRequest("/procSetting/list",{keyMap:{"equal_formTypeId":"1"}}).then(res => {
+        _this.postRequest("/process/listProcSetting",{keyMap:{"equal_formTypeId":"1"}}).then(res => {
           if (res.data.code == '00') {
             let list = res.data.data.list;
             for(let i = 0;i<list.length;i++){
@@ -80,7 +80,7 @@
               _this.jsondata.nodes[list[i].nodeId] = node;
             }
             //获取连线
-            _this.postRequest("/procDecision/list",{keyMap:{"equal_formTypeId":"1"}}).then(res => {
+            _this.postRequest("/process/listProcDecision",{keyMap:{"equal_formTypeId":"1"}}).then(res => {
               if (res.data.code == '00') {
                 let list = res.data.data.list;
                 for(let i = 0;i<list.length;i++){
@@ -89,6 +89,8 @@
                   line.to = list[i].nextNodeId;
                   line.name = list[i].name;
                   line.type = list[i].type;
+                  line.M = parseInt(list[i].position);//决策线为折线时
+                  line.alt = true;
                   _this.jsondata.lines[list[i].decisionId] = line;
                 }
                 console.log(_this.jsondata)
@@ -130,7 +132,7 @@
               subJson.nodeType = '04'//决策结点
             }
             //保存节点
-            _this.postRequest("/procSetting/save",subJson).then(res => {
+            _this.postRequest("/process/saveProcSetting",subJson).then(res => {
               if (res.data.code == '00') {
                 _this.work.transNewId(id,res.data.data,type);
               }
@@ -140,9 +142,8 @@
             subJson.nodeId = json.from;
             subJson.nextNodeId = json.to;
             subJson.name = json.name;
-            subJson.type = 'line';
             //保存连线
-            _this.postRequest("/procDecision/save",subJson).then(res => {
+            _this.postRequest("/process/saveProcDecision",subJson).then(res => {
               if (res.data.code == '00') {
                 // _this.work.transNewId(id,res.data.data,type);
               }
@@ -156,9 +157,9 @@
         _this.work.onItemFocus = function (id,type) {
           if(type == 'node'){
             _this.curNode = _this.work.$nodeData[id];
+            _this.curNode.isNode = true;
           }else if(type == 'line'){
             _this.curNode = _this.work.$lineData[id];
-            _this.curNode.isLine = true;
           }
 
           return true;
@@ -189,15 +190,16 @@
             nodes.push(subJson.nodes[node])
           }
           //保存节点
-          _this.postRequest("/procSetting/updateBatch",nodes).then(res => {
+          _this.postRequest("/process/updateBatchProcSetting",nodes).then(res => {
             if (res.data.code == '00') {
               for(let line in subJson.lines){
                 subJson.lines[line].decisionId = line;
                 subJson.lines[line].nodeId = subJson.lines[line].from;
                 subJson.lines[line].nextNodeId = subJson.lines[line].to;
+                subJson.lines[line].position = subJson.lines[line].M;
                 lines.push(subJson.lines[line])
               }
-              _this.postRequest("/procDecision/updateBatch",lines).then(res => {
+              _this.postRequest("/process/updateBatchProcDecision",lines).then(res => {
                 if (res.data.code == '00') {
                   _this.$message.success("保存成功");
                 }
@@ -209,12 +211,12 @@
         //删除节点触发
         _this.work.onItemDel = function (id,type) {
           if(type == 'node'){
-            _this.getRequest("/procSetting/delete?key="+id).then(res => {
+            _this.getRequest("/process/deleteProcSetting?key="+id).then(res => {
               if (res.data.code == '00') {
               }
             })
           }else if(type == 'line'){
-            _this.getRequest("/procDecision/delete?key="+id).then(res => {
+            _this.getRequest("/process/deleteProcDecision?key="+id).then(res => {
               if (res.data.code == '00') {
               }
             })
